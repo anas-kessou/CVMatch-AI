@@ -41,7 +41,7 @@ const AnalyticsTab = ({ scoreDistribution }: AnalyticsTabProps) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        {/* <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-6">Taux de matching par compétence</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart layout="vertical" data={[
@@ -86,7 +86,7 @@ const AnalyticsTab = ({ scoreDistribution }: AnalyticsTabProps) => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,17 +1,17 @@
-from __future__ import annotations
-
 from fastapi import APIRouter
 
-from app.core.config import settings
-
-router = APIRouter(tags=["health"])
+router = APIRouter()
 
 
-@router.get("/health")
-def health() -> dict[str, str]:
+@router.get("/health", tags=["health"])
+async def health() -> dict:
     return {
         "status": "ok",
-        "environment": settings.app_env,
-        "ollama_enabled": str(settings.ollama_enabled).lower(),
-        "ollama_model": settings.ollama_model,
+        "ai_model": "paraphrase-multilingual-MiniLM-L12-v2"
     }
+
+
+@router.get("/ready", tags=["health"])
+async def ready() -> dict:
+    # In a full app you'd check DB, Redis, Qdrant etc. Here we return ready.
+    return {"ready": True}

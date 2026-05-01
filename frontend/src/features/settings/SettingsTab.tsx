@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react';
+
 
 const SettingsTab = () => {
   return (
@@ -41,33 +41,7 @@ const SettingsTab = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Sites de recherche académique</h3>
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { name: 'Google Scholar', url: 'https://scholar.google.com', desc: 'Recherche d\'articles académiques' },
-            { name: 'ScienceDirect', url: 'https://sciencedirect.com', desc: 'Publications scientifiques' },
-            { name: 'IEEE Xplore', url: 'https://ieeexplore.ieee.org', desc: 'Ingénierie et technologie' },
-            { name: 'Scopus', url: 'https://scopus.com', desc: 'Base de données bibliographique' },
-          ].map((site) => (
-            <a
-              key={site.name}
-              href={site.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-emerald-300 transition-all group"
-            >
-              <div className="p-2 bg-slate-100 rounded-lg group-hover:bg-emerald-100 transition-colors">
-                <Search className="w-5 h-5 text-gray-600 group-hover:text-emerald-600 transition-colors" />
-              </div>
-              <div>
-                <p className="font-semibold text-gray-800 group-hover:text-emerald-700 transition-colors">{site.name}</p>
-                <p className="text-sm text-gray-500">{site.desc}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
+
     </div>
   );
 };

@@ -30,6 +30,8 @@ const DashboardTab = ({
   getScoreColor,
   getScoreBarColor,
 }: DashboardTabProps) => {
+  const safeText = (value: string) => value.trim().length > 0 ? value : 'Non renseigné';
+
   const statusData = [
     { name: 'Matchés', value: candidates.filter((candidate) => candidate.status === 'matched').length },
     { name: 'En attente', value: candidates.filter((candidate) => candidate.status === 'pending').length },
@@ -172,9 +174,9 @@ const DashboardTab = ({
         </div>
         <div className="grid grid-cols-3 gap-6">
           <div>
-            <p className="text-2xl font-bold text-gray-800">{jobDesc.title}</p>
-            <p className="text-gray-500">{jobDesc.company}</p>
-            <p className="text-sm text-gray-600 mt-3">{jobDesc.description}</p>
+            <p className="text-2xl font-bold text-gray-800">{safeText(jobDesc.title)}</p>
+            <p className="text-gray-500">{safeText(jobDesc.company)}</p>
+            <p className="text-sm text-gray-600 mt-3">{safeText(jobDesc.description)}</p>
           </div>
           <div>
             <p className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
@@ -182,6 +184,11 @@ const DashboardTab = ({
               Compétences techniques requises
             </p>
             <div className="flex flex-wrap gap-2">
+              {jobDesc.requiredHardSkills.length === 0 && (
+                <span className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                  Aucune compétence renseignée
+                </span>
+              )}
               {jobDesc.requiredHardSkills.map((skill) => (
                 <span key={skill} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
                   {skill}
@@ -200,6 +207,11 @@ const DashboardTab = ({
               Soft skills requis
             </p>
             <div className="flex flex-wrap gap-2">
+              {jobDesc.requiredSoftSkills.length === 0 && (
+                <span className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                  Aucune compétence renseignée
+                </span>
+              )}
               {jobDesc.requiredSoftSkills.map((skill) => (
                 <span key={skill} className="px-3 py-1.5 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
                   {skill}
@@ -210,7 +222,7 @@ const DashboardTab = ({
               <FileText className="w-4 h-4 text-purple-600" />
               Niveau d'études requis
             </p>
-            <p className="text-gray-600">{jobDesc.educationLevel}</p>
+            <p className="text-gray-600">{safeText(jobDesc.educationLevel)}</p>
           </div>
         </div>
       </div>

@@ -24,7 +24,10 @@ const titleByTab: Record<ActiveTab, string> = {
 };
 
 const subtitleByTab = (tab: ActiveTab, values: { candidatesCount: number; filteredCount: number; uploadedCount: number; jobTitle: string }) => {
-  if (tab === 'dashboard') return `Analyse de ${values.candidatesCount} candidats pour le poste "${values.jobTitle}"`;
+  if (tab === 'dashboard') {
+    const jobLabel = values.jobTitle.trim().length > 0 ? `"${values.jobTitle}"` : 'non renseigné';
+    return `Analyse de ${values.candidatesCount} candidats pour le poste ${jobLabel}`;
+  }
   if (tab === 'job') return 'Définissez le profil recherché';
   if (tab === 'upload') return `${values.uploadedCount} fichiers uploadés`;
   if (tab === 'candidates') return `${values.filteredCount} candidats trouvés`;

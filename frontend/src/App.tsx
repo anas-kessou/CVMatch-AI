@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { fetchApiHealth } from './services/api';
-import { useIngestionPolling } from './hooks/useIngestionPolling';
 import { useScoringWorkflow } from './hooks/useScoringWorkflow';
 import { useDashboardMetrics } from './hooks/useDashboardMetrics';
 import Sidebar from './components/layout/Sidebar';
@@ -16,13 +15,13 @@ import JobFormModal from './components/job-post/JobFormModal';
 import type { ActiveTab, Candidate, JobDescription } from './types/app';
 
 const initialJobDescription: JobDescription = {
-  title: 'Data Scientist Senior',
-  company: 'TechCorp Solutions',
-  description: 'Nous recherchons un Data Scientist Senior pour des projets IA et Machine Learning.',
-  requiredHardSkills: ['Python', 'Machine Learning', 'SQL'],
-  requiredSoftSkills: ['Communication', 'Travail d équipe'],
-  minExperience: 3,
-  educationLevel: 'Master',
+  title: '',
+  company: '',
+  description: '',
+  requiredHardSkills: [],
+  requiredSoftSkills: [],
+  minExperience: 0,
+  educationLevel: '',
 };
 
 const App: React.FC = () => {
@@ -39,7 +38,6 @@ const App: React.FC = () => {
   const [apiModel, setApiModel] = useState<string>('N/A');
   const [healthError, setHealthError] = useState<string>('');
   const [showJobForm, setShowJobForm] = useState(false);
-  const { poll: pollIngestionJob } = useIngestionPolling();
 
   const {
     isAnalyzing,
@@ -51,7 +49,6 @@ const App: React.FC = () => {
   } = useScoringWorkflow({
     jobDesc,
     uploadedCvFiles,
-    pollIngestionJob,
     setCandidates,
     setSelectedCandidate,
     setActiveTab,
@@ -70,11 +67,11 @@ const App: React.FC = () => {
       try {
         const health = await fetchApiHealth();
         setApiStatus('online');
-        setApiModel(health.ollama_model);
+        setApiModel(health.ai_model ?? 'N/A');
         setHealthError('');
       } catch (_error) {
         setApiStatus('offline');
-        setHealthError('Backend indisponible. Vérifiez FastAPI + Ollama.');
+        setHealthError('Backend indisponible. Vérifiez FastAPI.');
       }
     };
 
@@ -142,6 +139,24 @@ const App: React.FC = () => {
     setUploadedCvFiles(prev => prev.filter((_file, index) => index !== fileIndex));
   };
 
+  const handleUpdateCandidateStatus = (candidateId: number, status: Candidate['status']) => {
+    setCandidates((prev) => prev.map((candidate) => (
+      candidate.id === candidateId
+        ? { ...candidate, status }
+        : candidate
+    )));
+
+    setSelectedCandidate((prev) => {
+      if (!prev || prev.id !== candidateId) {
+        return prev;
+      }
+      return {
+        ...prev,
+        status,
+      };
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar activeTab={activeTab} onChangeTab={setActiveTab} />
@@ -198,23 +213,19 @@ const App: React.FC = () => {
                 onDeleteFile={handleDeleteFile}
               />
 
-              {/* Stack Technique */}
+              {/* Aide workflow */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-bold text-gray-800 mb-6">Stack Technique Suggérée</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-6">Aperçu du workflow d'analyse</h3>
                 <div className="grid grid-cols-4 gap-4">
                   {[
-                    { name: 'PyMuPDF', desc: 'Extraction PDF', color: 'bg-blue-50 text-blue-700 border-blue-200' },
-                    { name: 'SpaCy', desc: 'NER & NLP', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-                    { name: 'FastAPI', desc: 'Backend API', color: 'bg-teal-50 text-teal-700 border-teal-200' },
-                    { name: 'React', desc: 'Frontend', color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
-                    { name: 'Sentence-Transformers', desc: 'Similarité sémantique', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-                    { name: 'PostgreSQL', desc: 'Base de données', color: 'bg-slate-50 text-slate-700 border-slate-200' },
-                    { name: 'ChromaDB', desc: 'Vector store', color: 'bg-orange-50 text-orange-700 border-orange-200' },
-                    { name: 'LangChain', desc: 'Orchestration LLM', color: 'bg-green-50 text-green-700 border-green-200' },
-                  ].map((tech) => (
-                    <div key={tech.name} className={`p-4 rounded-lg border ${tech.color} hover:shadow-md transition-shadow`}>
-                      <p className="font-bold">{tech.name}</p>
-                      <p className="text-xs opacity-75">{tech.desc}</p>
+                    { name: '1. Définition du poste', desc: 'Saisissez les critères de votre secteur (santé, industrie, finance...)', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+                    { name: '2. Import des CV', desc: 'Chargez un ou plusieurs CV à analyser automatiquement', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                    { name: '3. Scoring intelligent', desc: 'Le système compare les profils selon vos exigences', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+                    { name: '4. Sélection finale', desc: 'Classez et suivez les candidats selon leur statut', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                  ].map((step) => (
+                    <div key={step.name} className={`p-4 rounded-lg border ${step.color} hover:shadow-md transition-shadow`}>
+                      <p className="font-bold">{step.name}</p>
+                      <p className="text-xs opacity-75">{step.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -251,6 +262,7 @@ const App: React.FC = () => {
         candidate={selectedCandidate}
         radarData={radarData}
         onClose={() => setSelectedCandidate(null)}
+        onUpdateCandidateStatus={handleUpdateCandidateStatus}
         getScoreColor={getScoreColor}
         getScoreBgColor={getScoreBgColor}
       />

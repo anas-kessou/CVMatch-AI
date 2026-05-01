@@ -1,154 +1,84 @@
 import { api } from '@/lib/axios';
 
-export type MatchStatus = 'matched' | 'pending' | 'reviewed';
-
-export interface ScoringRequestPayload {
-  job: {
-    title: string;
-    company: string;
-    description: string;
-    required_hard_skills: string[];
-    required_soft_skills: string[];
-    min_experience: number;
-    education_level: 'none' | 'license' | 'master' | 'doctorat' | 'other';
-  };
-  candidates: Array<{
-    id: number;
-    name: string;
-    email?: string | null;
-    phone?: string | null;
-    location?: string | null;
-    headline?: string | null;
-    summary?: string | null;
-    raw_text: string;
-    hard_skills?: string[];
-    soft_skills?: string[];
-    experience_years?: number;
-    education_level?: 'none' | 'license' | 'master' | 'doctorat' | 'other';
-    experiences?: Array<{
-      title: string;
-      company?: string | null;
-      duration?: string | null;
-    }>;
-    educations?: Array<{
-      degree: string;
-      school?: string | null;
-      year?: string | null;
-    }>;
-  }>;
+export interface JobCreatePayload {
+  title: string;
+  description: string;
+  required_hard_skills: string[];
+  required_soft_skills: string[];
+  min_experience_years: number;
 }
 
-export interface RankedCandidate {
-  id: number | null;
-  name: string;
-  email: string | null;
+export interface JobResponsePayload {
+  id: number;
+  title: string;
+  description: string;
+}
+
+export interface UploadResponsePayload {
+  message: string;
+  cv_id: number;
   score: number;
-  status: MatchStatus;
-  extracted_hard_skills: string[];
-  extracted_soft_skills: string[];
-  extracted_experience_years: number;
-  extracted_education_level: string;
-  match_details: {
-    technical: number;
-    experience: number;
-    education: number;
-    soft_skills: number;
-    semantic: number;
-  };
-  rationale: string;
 }
 
-export interface ScoringResponsePayload {
-  ranked_candidates: RankedCandidate[];
-  count: number;
+export interface RankingItemPayload {
+  candidate_id: number;
+  cv_filename: string;
+  email: string | null;
+  global_score: number;
+  semantic_score: number;
+}
+
+export interface JobRankingsPayload {
+  job_id: number;
+  rankings: RankingItemPayload[];
+}
+
+export interface CvScoreDetailPayload {
+  candidate_id: number;
+  global_score: number;
+  semantic_score: number;
+  explanation: string;
+  matched_skills: string[];
+  missing_skills: string[];
 }
 
 export interface HealthPayload {
   status: string;
-  environment: string;
-  ollama_enabled: string;
-  ollama_model: string;
-}
-
-export interface UploadParsedCandidate {
-  file_name: string;
-  candidate: {
-    id: number;
-    name: string;
-    email: string | null;
-    phone: string | null;
-    location: string | null;
-    headline: string | null;
-    summary: string | null;
-    raw_text: string;
-    hard_skills: string[];
-    soft_skills: string[];
-    experience_years: number;
-    education_level: 'none' | 'license' | 'master' | 'doctorat' | 'other';
-    experiences: Array<{
-      title: string;
-      company: string | null;
-      duration: string | null;
-    }>;
-    educations: Array<{
-      degree: string;
-      school: string | null;
-      year: string | null;
-    }>;
-  };
-}
-
-export interface UploadCvResponsePayload {
-  accepted: string[];
-  rejected: string[];
-  count: number;
-  parsed_candidates: UploadParsedCandidate[];
-}
-
-export interface IngestionJobCreatePayload {
-  job_id: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
-}
-
-export interface IngestionJobStatusPayload {
-  job_id: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
-  created_at: string;
-  updated_at: string;
-  total_files: number;
-  processed_files: number;
-  accepted: string[];
-  rejected: string[];
-  parsed_candidates: UploadParsedCandidate[];
-  error_message: string | null;
+  ready?: boolean;
+  ai_model?: string;
 }
 
 export async function fetchApiHealth(): Promise<HealthPayload> {
-  const response = await api.get<HealthPayload>('/api/v1/health');
+  const response = await api.get<HealthPayload>('/health');
   return response.data;
 }
 
-export async function scoreCandidates(payload: ScoringRequestPayload): Promise<ScoringResponsePayload> {
-  const response = await api.post<ScoringResponsePayload>('/api/v1/score', payload);
+export async function getAllJobs(): Promise<JobResponsePayload[]> {
+  const response = await api.get<JobResponsePayload[]>('/api/v1/jobs');
   return response.data;
 }
 
-export async function uploadCvFiles(files: File[]): Promise<IngestionJobCreatePayload> {
+export async function createJob(payload: JobCreatePayload): Promise<JobResponsePayload> {
+  const response = await api.post<JobResponsePayload>('/api/v1/jobs', payload);
+  return response.data;
+}
+
+export async function uploadCvFile(jobId: number, file: File): Promise<UploadResponsePayload> {
   const formData = new FormData();
-  files.forEach((file) => {
-    formData.append('files', file);
+  formData.append('file', file);
+  
+  const response = await api.post<UploadResponsePayload>(`/api/v1/jobs/${jobId}/cvs/upload`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
   });
-
-  const response = await api.post<IngestionJobCreatePayload>('/api/v1/cvs/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-
   return response.data;
 }
 
-export async function getIngestionJobStatus(jobId: string): Promise<IngestionJobStatusPayload> {
-  const response = await api.get<IngestionJobStatusPayload>(`/api/v1/cvs/ingestion-jobs/${jobId}`);
+export async function getJobRankings(jobId: number): Promise<JobRankingsPayload> {
+  const response = await api.get<JobRankingsPayload>(`/api/v1/jobs/${jobId}/scores`);
+  return response.data;
+}
+
+export async function getCvScoreDetail(cvId: number): Promise<CvScoreDetailPayload> {
+  const response = await api.get<CvScoreDetailPayload>(`/api/v1/cvs/${cvId}/score`);
   return response.data;
 }

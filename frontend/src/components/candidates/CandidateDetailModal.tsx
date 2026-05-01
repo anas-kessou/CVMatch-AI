@@ -7,11 +7,19 @@ interface CandidateDetailModalProps {
   candidate: Candidate | null;
   radarData: Array<{ subject: string; candidat: number; requis: number }>;
   onClose: () => void;
+  onUpdateCandidateStatus: (candidateId: number, status: Candidate['status']) => void;
   getScoreColor: (score: number) => string;
   getScoreBgColor: (score: number) => string;
 }
 
-const CandidateDetailModal = ({ candidate, radarData, onClose, getScoreColor, getScoreBgColor }: CandidateDetailModalProps) => {
+const CandidateDetailModal = ({
+  candidate,
+  radarData,
+  onClose,
+  onUpdateCandidateStatus,
+  getScoreColor,
+  getScoreBgColor,
+}: CandidateDetailModalProps) => {
   if (!candidate) {
     return null;
   }
@@ -142,13 +150,34 @@ const CandidateDetailModal = ({ candidate, radarData, onClose, getScoreColor, ge
           </div>
 
           <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
-            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            <button type="button" className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors font-medium">
               <span className="flex items-center gap-2"><Download className="w-4 h-4" /> Télécharger CV</span>
             </button>
-            <button className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+            <a
+              href={`mailto:${candidate.email}`}
+              className="px-4 py-2 border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+            >
               <span className="flex items-center gap-2"><Mail className="w-4 h-4" /> Contacter</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => onUpdateCandidateStatus(candidate.id, 'pending')}
+              className="px-4 py-2 border border-blue-200 text-blue-700 rounded-lg hover:bg-blue-50 transition-colors font-medium"
+            >
+              En attente
             </button>
-            <button className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow-sm">
+            <button
+              type="button"
+              onClick={() => onUpdateCandidateStatus(candidate.id, 'reviewed')}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+            >
+              Examiné
+            </button>
+            <button
+              type="button"
+              onClick={() => onUpdateCandidateStatus(candidate.id, 'matched')}
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow-sm"
+            >
               <span className="flex items-center gap-2"><CheckCircle className="w-4 h-4" /> Marquer comme matché</span>
             </button>
           </div>

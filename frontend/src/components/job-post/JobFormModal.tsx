@@ -31,7 +31,7 @@ const JobFormModal = ({ open, jobDesc, onClose, onSubmit }: JobFormModalProps) =
       requiredHardSkills: parseCsv(formData.get('requiredHardSkills')),
       requiredSoftSkills: parseCsv(formData.get('requiredSoftSkills')),
       minExperience: Number(formData.get('minExperience') ?? 0),
-      educationLevel: String(formData.get('educationLevel') ?? 'Master'),
+      educationLevel: String(formData.get('educationLevel') ?? '').trim(),
     });
   };
 
@@ -62,11 +62,11 @@ const JobFormModal = ({ open, jobDesc, onClose, onSubmit }: JobFormModalProps) =
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Compétences techniques (séparées par virgules)</label>
-              <input name="requiredHardSkills" type="text" defaultValue={jobDesc.requiredHardSkills.join(', ')} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="Python, SQL, Machine Learning" />
+              <input name="requiredHardSkills" type="text" defaultValue={jobDesc.requiredHardSkills.join(', ')} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="" />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Soft skills (séparés par virgules)</label>
-              <input name="requiredSoftSkills" type="text" defaultValue={jobDesc.requiredSoftSkills.join(', ')} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="Communication, Leadership" />
+              <input name="requiredSoftSkills" type="text" defaultValue={jobDesc.requiredSoftSkills.join(', ')} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" placeholder="" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -76,10 +76,12 @@ const JobFormModal = ({ open, jobDesc, onClose, onSubmit }: JobFormModalProps) =
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Niveau d'études</label>
-              <select name="educationLevel" defaultValue={jobDesc.educationLevel} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
-                <option>Licence</option>
-                <option>Master</option>
-                <option>Doctorat</option>
+              <select name="educationLevel" defaultValue={jobDesc.educationLevel || ''} className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
+                <option value="">Non spécifié</option>
+                <option value="Licence">Licence</option>
+                <option value="Master">Master</option>
+                <option value="Doctorat">Doctorat</option>
+                <option value="Autre">Autre</option>
               </select>
             </div>
           </div>

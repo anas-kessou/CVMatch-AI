@@ -26,24 +26,28 @@ const CandidatesTab = ({
       <div className="flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => onFilterStatusChange('all')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
           >
             Tous ({candidates.length})
           </button>
           <button
+            type="button"
             onClick={() => onFilterStatusChange('matched')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'matched' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
           >
             Matchés ({candidates.filter((candidate) => candidate.status === 'matched').length})
           </button>
           <button
+            type="button"
             onClick={() => onFilterStatusChange('pending')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'pending' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
           >
             En attente ({candidates.filter((candidate) => candidate.status === 'pending').length})
           </button>
           <button
+            type="button"
             onClick={() => onFilterStatusChange('reviewed')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterStatus === 'reviewed' ? 'bg-gray-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
           >
