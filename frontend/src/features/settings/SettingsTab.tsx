@@ -1,23 +1,65 @@
 
 
+import { useScoringSettings } from '@/hooks/useScoringSettings';
+
 const SettingsTab = () => {
+  const { weights, updateWeight } = useScoringSettings();
+
+  const totalWeights = Object.values(weights).reduce((a, b) => a + b, 0);
+  const isError = totalWeights !== 100;
+
+  const weightKeys = [
+    { key: 'skills' as const, label: 'Poids - Compétences Techniques' },
+    { key: 'experience' as const, label: 'Poids - Expérience' },
+    { key: 'education' as const, label: "Poids - Niveau d'études" },
+    { key: 'softSkills' as const, label: 'Poids - Soft Skills' },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="text-lg font-bold text-gray-800 mb-6">Configuration du Scoring</h3>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-bold text-gray-800 border-l-4 border-emerald-500 pl-3">Configuration du Scoring</h3>
+          <div className={`px-4 py-2 rounded-lg text-sm font-bold ${isError ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}`}>
+            Total : {totalWeights}%
+          </div>
+        </div>
+        
+        {isError && (
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+            ⚠️ Le total des poids doit être exactement égal à 100%. Veuillez ajuster les valeurs.
+          </div>
+        )}
+
         <div className="space-y-6">
-          {[40, 30, 20, 10].map((value, index) => (
-            <div key={value}>
+          {weightKeys.map(({ key, label }) => (
+            <div key={key}>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-sm font-semibold text-gray-700">
-                  {index === 0 && 'Poids - Compétences Techniques'}
-                  {index === 1 && 'Poids - Expérience'}
-                  {index === 2 && 'Poids - Niveau d\'études'}
-                  {index === 3 && 'Poids - Soft Skills'}
+                  {label}
                 </label>
-                <span className="text-sm text-emerald-600 font-bold">{value}%</span>
+                <div className="flex items-center space-x-3">
+                  <span className={`text-sm font-bold ${isError ? 'text-red-500' : 'text-emerald-600'}`}>{weights[key]}%</span>
+                </div>
               </div>
-              <input type="range" defaultValue={value} className="w-full accent-emerald-600" disabled />
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={weights[key]}
+                  onChange={(e) => updateWeight(key, Number(e.target.value))}
+                  className={`flex-1 ${isError ? 'accent-red-500' : 'accent-emerald-600'}`}
+                />
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="100" 
+                  value={weights[key]} 
+                  onChange={(e) => updateWeight(key, Number(e.target.value))}
+                  className={`w-16 p-1 text-center border rounded-md text-sm font-bold focus:outline-none focus:ring-2 ${isError ? 'border-red-300 focus:ring-red-500' : 'border-gray-200 focus:ring-emerald-500'}`}
+                />
+              </div>
             </div>
           ))}
         </div>

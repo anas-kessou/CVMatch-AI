@@ -63,9 +63,15 @@ export async function createJob(payload: JobCreatePayload): Promise<JobResponseP
   return response.data;
 }
 
-export async function uploadCvFile(jobId: number, file: File): Promise<UploadResponsePayload> {
+export async function uploadCvFile(jobId: number, file: File, weights?: { skills: number; experience: number; education: number; softSkills: number }): Promise<UploadResponsePayload> {
   const formData = new FormData();
   formData.append('file', file);
+  if (weights) {
+    formData.append('weight_skills', (weights.skills / 100).toString());
+    formData.append('weight_experience', (weights.experience / 100).toString());
+    formData.append('weight_education', (weights.education / 100).toString());
+    formData.append('weight_soft_skills', (weights.softSkills / 100).toString());
+  }
   
   const response = await api.post<UploadResponsePayload>(`/api/v1/jobs/${jobId}/cvs/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }

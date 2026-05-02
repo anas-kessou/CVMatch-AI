@@ -12,18 +12,16 @@ pgvector
 python-jose[cryptography]
 passlib[bcrypt]
 
-# AI & NLP Pipeline
+# Parsing Modern
+docling>=2.92.0
+pymupdf4llm>=0.0.17
 PyMuPDF
-python-docx
-spacy>=3.7
-sentence-transformers
-scikit-learn
+
+# AI, LLM & Embeddings
 chromadb
-
-
-# AI & NLP / CV Parsing
-PyMuPDF
-python-docx
-spacy
-sentence-transformers
-scikit-learn
+FlagEmbedding>=1.4.0
+numpy>=2.0.0
+instructor>=1.15.0
+openai
+google-generativeai
+tenacity>=8.2.0

@@ -66,9 +66,16 @@ export const useScoringWorkflow = ({
       // 2. Upload and Parse CVs sequentially
       let processed = 0;
       const total = uploadedCvFiles.length;
+      
+      let weights;
+      try {
+        const stored = localStorage.getItem('scoringWeights');
+        if (stored) weights = JSON.parse(stored);
+      } catch (e) {}
+
       for (const file of uploadedCvFiles) {
         setIngestionMessage(`Analyse de ${file.name} (${processed + 1}/${total})...`);
-        await uploadCvFile(job.id, file);
+        await uploadCvFile(job.id, file, weights);
         processed++;
       }
 
