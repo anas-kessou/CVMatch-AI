@@ -35,18 +35,24 @@ def start_ngrok(port: int) -> str | None:
         print("NGROK_AUTHTOKEN is not set. The backend will run only inside Kaggle.")
         return None
 
+    ngrok_domain = os.getenv("NGROK_DOMAIN") or load_kaggle_secret("NGROK_DOMAIN")
+
     from pyngrok import ngrok
 
     ngrok.set_auth_token(token)
     for tunnel in ngrok.get_tunnels():
         ngrok.disconnect(tunnel.public_url)
 
-    public_url = ngrok.connect(port, bind_tls=True).public_url
+    connect_kwargs = {"bind_tls": True}
+    if ngrok_domain:
+        connect_kwargs["domain"] = ngrok_domain
+
+    public_url = ngrok.connect(port, **connect_kwargs).public_url
     print("\nKaggle backend is public:")
     print(public_url)
-    print("\nPut this in your local frontend/.env.local:")
+    print("\nPut this in your frontend production/development environment:")
     print(f"VITE_API_BASE_URL={public_url}")
-    print("\nThen restart npm run dev locally.\n")
+    print("\nKeep this cell running.\n")
     return public_url
 
 
